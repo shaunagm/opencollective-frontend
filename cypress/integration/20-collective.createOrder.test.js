@@ -56,8 +56,9 @@ describe('collective.createOrder page', () => {
   });
 
   it('makes an order as a new organization', () => {
+    const email = `testuser+${Math.round(Math.random() * 1000000)}@gmail.com`;
     cy.visit(`${WEBSITE_URL}/apex/donate`);
-    cy.get('.inputField.email input').type('testuser@opencollective.com');
+    cy.get('.inputField.email input').type(email);
     cy.wait(400);
     cy.get('.actions .submit button').click();
     cy.get('.result .error').contains('Credit card missing');
