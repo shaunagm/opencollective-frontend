@@ -2,14 +2,10 @@
 // https://github.com/zeit/next.js/blob/3949c82bdfe268f841178979800aa8e71bbf412c/examples/with-apollo/lib/initApollo.js
 
 import fetch from 'cross-fetch';
-import { ApolloClient } from 'apollo-client';
-import { HttpLink } from 'apollo-link-http';
-import { ApolloLink } from 'apollo-link';
-import { onError } from 'apollo-link-error';
-import {
+import ApolloClient, {
   InMemoryCache,
   IntrospectionFragmentMatcher,
-} from 'apollo-cache-inmemory';
+} from 'apollo-boost';
 
 import { getGraphqlUrl } from './utils';
 
@@ -44,39 +40,13 @@ function createClient(initialState, options = {}) {
     fragmentMatcher,
   });
 
-  const errorLink = onError(({ graphQLErrors, networkError }) => {
-    if (graphQLErrors) {
-      graphQLErrors.map(error => {
-        if (error) {
-          const { message, locations, path } = error;
-          console.error(
-            `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
-          );
-          return;
-        }
-
-        console.error('[GraphQL error]: Received null error');
-      });
-    }
-
-    if (networkError) {
-      console.error(`[Network error]: ${networkError}`);
-    }
-  });
-
-  const httpLink = new HttpLink({
-    uri: getGraphqlUrl(),
-    fetch,
-    headers,
-  });
-
-  const link = ApolloLink.from([errorLink, httpLink]);
-
   return new ApolloClient({
     connectToDevTools: process.browser,
     ssrMode: !process.browser, // Disables forceFetch on the server (so queries are only run once)
     cache: cache.restore(initialState),
-    link,
+    uri: getGraphqlUrl(),
+    fetch,
+    headers,
   });
 }
 
