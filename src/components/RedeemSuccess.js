@@ -50,7 +50,7 @@ class RedeemSuccess extends React.Component {
             <Instructions>
               <FormattedMessage
                 id="redeem.card.success.instructions"
-                defaultMessage="We’ve sent an email to {email} with instructions to verify your new Open Collective account and credit it with the amount of your gift card."
+                defaultMessage="We’ve sent an email to {email} with instructions to verify your Open Collective account and credit it with your gift card."
                 values={{ email: <strong>{email}</strong> }}
               />
             </Instructions>
