@@ -9,3 +9,5 @@ yarn.lock
 build
 cypress/screenshots
 *.swp
+styleguide/index.html
+styleguide/build/
