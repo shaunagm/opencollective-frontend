@@ -111,7 +111,7 @@ class CreateCollective extends React.Component {
         successParams.CollectiveId = collective.id;
         successParams.collectiveSlug = collective.slug;
       } else {
-        route = `/${collective.slug}/edit#host`;
+        route = `/${collective.slug}/edit/host`;
       }
 
       this.setState({
