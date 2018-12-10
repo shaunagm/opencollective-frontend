@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
+import { ArrowBack } from 'styled-icons/material/ArrowBack.cjs';
+
 import InputField from './InputField';
 import EditTiers from './EditTiers';
 import EditGoals from './EditGoals';
@@ -17,7 +19,10 @@ import Link from './Link';
 import { get } from 'lodash';
 import styled, { css } from 'styled-components';
 import { Flex, Box } from '@rebass/grid';
+import StyledButton from './StyledButton';
 import EditVirtualCards from './EditVirtualCards';
+import CreateVirtualCardsBulk from './CreateVirtualCardsBulk';
+import CreateVirtualCardsWithoutEmail from './CreateVirtualCardsWithoutEmail';
 
 const selectedStyle = css`
   background-color: #eee;
@@ -74,7 +79,7 @@ class EditCollectiveForm extends React.Component {
     this.defaultTierType = collective.type === 'EVENT' ? 'TICKET' : 'TIER';
     this.showEditMembers = ['COLLECTIVE', 'ORGANIZATION'].includes(collective.type);
     this.showPaymentMethods = ['USER', 'ORGANIZATION'].includes(collective.type);
-    this.showVirtualCards = collective.canCreateVirtualCards;
+    this.showVirtualCards = true;
     this.members = collective.members && collective.members.filter(m => ['ADMIN', 'MEMBER'].includes(m.role));
 
     this.messages = defineMessages({
@@ -546,7 +551,7 @@ class EditCollectiveForm extends React.Component {
             )}
             {this.showVirtualCards && (
               <MenuItem
-                selected={this.state.section === 'gift-cards'}
+                selected={['gift-cards-create', 'gift-cards-send', 'gift-cards'].includes(this.state.section)}
                 route="editCollectiveSection"
                 params={{ slug: collective.slug, section: 'gift-cards' }}
                 className="MenuItem gift-cards"
@@ -654,14 +659,44 @@ class EditCollectiveForm extends React.Component {
                   onChange={this.handleObjectChange}
                 />
               )}
-              {this.state.section === 'gift-cards' && <EditVirtualCards collectiveId={collective.id} />}
+              {this.state.section === 'gift-cards' && (
+                <EditVirtualCards collectiveId={collective.id} collectiveSlug={collective.slug} />
+              )}
+              {['gift-cards-create', 'gift-cards-send'].includes(this.state.section) && (
+                <Flex flexDirection="column">
+                  <Box mb="3em">
+                    <Link route="editCollectiveSection" params={{ slug: collective.slug, section: 'gift-cards' }}>
+                      <StyledButton>
+                        <ArrowBack size="1em" />{' '}
+                        <FormattedMessage id="virtualCards.returnToEdit" defaultMessage="Go back to gift cards list" />
+                      </StyledButton>
+                    </Link>
+                  </Box>
+                  {this.state.section === 'gift-cards-send' && (
+                    <CreateVirtualCardsBulk
+                      collectiveId={collective.id}
+                      collectiveSlug={collective.slug}
+                      currency={collective.currency}
+                    />
+                  )}
+                  {this.state.section === 'gift-cards-create' && (
+                    <CreateVirtualCardsWithoutEmail
+                      collectiveId={collective.id}
+                      collectiveSlug={collective.slug}
+                      currency={collective.currency}
+                    />
+                  )}
+                </Flex>
+              )}
               {this.state.section === 'connected-accounts' && (
                 <EditConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />
               )}
               {this.state.section === 'export' && <ExportData collective={collective} />}
             </div>
 
-            {['export', 'connected-accounts', 'host', 'gift-cards'].indexOf(this.state.section) === -1 && (
+            {['export', 'connected-accounts', 'host', 'gift-cards', 'gift-cards-create', 'gift-cards-send'].indexOf(
+              this.state.section,
+            ) === -1 && (
               <div className="actions">
                 <Button
                   bsStyle="primary"
